@@ -1,8 +1,19 @@
-# hash:sha256:3c09b543c48e44c5101c6214c0ea6b12b9be7764a1be670f4e8152f31acd1e1d
-FROM registry.codeocean.allenneuraldynamics.org/codeocean/jupyterlab:3.0.9-miniconda4.9.2-python3.8-ubuntu20.04
+# hash:sha256:7dbb41516855b7a4c5c2a305cc83a36b2ceee9b1e4f83644fbeaffd8054316cf
+ARG REGISTRY_HOST
+FROM $REGISTRY_HOST/codeocean/mambaforge3:23.1.0-4-python3.10.12-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG GIT_ASKPASS
 ARG GIT_ACCESS_TOKEN
 COPY git-askpass /
+
+ADD "https://github.com/coder/code-server/releases/download/v4.95.3/code-server-4.95.3-linux-amd64.tar.gz" /.code-server/code-server.tar.gz
+	
+RUN cd /.code-server \
+    && tar -xvf code-server.tar.gz \
+    && rm code-server.tar.gz \
+    && ln -s /.code-server/code-server-4.95.3-linux-amd64/bin/code-server  /usr/bin/code-server
+
+COPY postInstall /
+RUN /postInstall
